@@ -231,12 +231,10 @@ static void xlcdc_start(void)
 {
 #ifdef CONFIG_LVDSC
 	xlcdc_writel(LCDC_CFG(0), LCDC_CFG0_CLKPWMSEL |
-				 LCDC_CFG0_CLKBYP |
-				 LCDC_CFG0_CLKPOL);
+				 LCDC_CFG0_CLKBYP);
 #else
 	xlcdc_writel(LCDC_CFG(0), LCDC_CFG0_CLKDIV(clock_div()) |
-				 LCDC_CFG0_CLKPWMSEL |
-				 LCDC_CFG0_CLKPOL);
+				 LCDC_CFG0_CLKPWMSEL);
 #endif
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
@@ -258,11 +256,7 @@ static void xlcdc_start(void)
 
 	xlcdc_writel(LCDC_CFG(5), LCDC_CFG5_GUARDTIME(0) |
 				 LCDC_CFG5_DPI |
-				 LCDC_CFG5_MODE_OUTPUT_DPI_24BPP |
-				 LCDC_CFG5_DISPDLY |
-				 LCDC_CFG5_VSPDLYS |
-				 LCDC_CFG5_VSPOL |
-				 LCDC_CFG5_HSPOL);
+				 LCDC_CFG5_MODE_OUTPUT_DPI_24BPP);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
 #ifndef BOARD_LCD_PIN_BL
@@ -499,8 +493,10 @@ UNSUPPORTED:
 	xlcdc.ovr_ypos      = (xlcdc.ovr_sc_height >= xlcdc.height) ? 0 : ((xlcdc.height - xlcdc.ovr_sc_height) / 2);
 
 	xlcdc_show_heo();
+#ifdef CONFIG_LOGO_BL_DELAY
 	if (LOGO_BL_DELAY)
 		mdelay(LOGO_BL_DELAY);
+#endif
 	xlcdc_set_backlight(LOGO_BL);
 
 	return 0;
