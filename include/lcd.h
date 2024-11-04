@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-#ifndef	__LCDC_H__
-#define	__LCDC_H__
+#ifndef	__LCD_H__
+#define	__LCD_H__
 
-extern void lcdc_init(void);
-extern int lcdc_display(void);
+extern int lcd_display(void);
+extern int lcd_off(void);
 extern int bmp_size(void *p);
 
-#endif	/* #ifndef __LCDC_H__ */
+#endif	/* #ifndef __LCD_H__ */

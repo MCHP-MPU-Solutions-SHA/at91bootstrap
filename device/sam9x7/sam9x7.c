@@ -29,6 +29,8 @@
 __attribute__((weak)) void wilc_pwrseq(void);
 __attribute__((weak)) void at91_can_stdby_dis(void);
 
+void at91_xlcdc_hw_init(void);
+
 #define PLLA_DIV 0
 #define PLLA_COUNT 0x3f
 #define PLLA_FRACR(_p, _q) \
@@ -332,6 +334,10 @@ void hw_init(void)
 	writel(reg, (AT91C_BASE_SFR + SFR_DDRCFG));
 	/* Initialize DDRAM Controller */
 	ddram_init();
+#endif
+
+#ifdef CONFIG_XLCDC
+	at91_xlcdc_hw_init();
 #endif
 
 #ifdef CONFIG_BOARD_QUIRK_SAM9X75_EB

@@ -10,7 +10,7 @@
 #include "timer.h"
 #include "div.h"
 #include "fdt.h"
-#include "lcdc.h"
+#include "lcd.h"
 
 int spi_flash_read_reg(struct spi_flash *flash, u8 inst, u8 *buf, size_t len)
 {
@@ -316,7 +316,7 @@ int spi_flash_loadimage(struct spi_flash *flash, struct image_info *image)
 	}
 
 	if (!ret)
-		lcdc_display();
+		lcd_display();
 #endif
 
 #ifdef CONFIG_OF_LIBFDT

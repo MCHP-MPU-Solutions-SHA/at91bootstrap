@@ -6,7 +6,7 @@
 #include "common.h"
 #include "hardware.h"
 #include "board.h"
-#include "lcdc.h"
+#include "lcd.h"
 
 #include "string.h"
 
@@ -131,7 +131,7 @@ int load_sdcard(struct image_info *image)
 
 	ret = sdcard_loadimage(image->logo_filename, image->logo_dest);
 	if (!ret)
-		lcdc_display();
+		lcd_display();
 #endif
 
 	dbg_info("SD/MMC: Image: Read file %s to %x\n",

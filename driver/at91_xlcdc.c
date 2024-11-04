@@ -198,6 +198,20 @@ static void xlcdc_set_backlight(u8 level)
 
 static void xlcdc_stop(void)
 {
+	if (xlcdc_readl(LCDC_HEOEN)) {
+		/* Disable HEO layer */
+		xlcdc_writel(LCDC_HEOEN, 0);
+		xlcdc_writel(LCDC_ATTRE, LCDC_ATTR_HEO);
+		wait_attrs_equal(LCDC_ATTR_SIP);
+	}
+
+	if (xlcdc_readl(LCDC_BASEEN)) {
+		/* Disable BASE layer */
+		xlcdc_writel(LCDC_BASEEN, 0);
+		xlcdc_writel(LCDC_ATTRE, LCDC_ATTR_BASE);
+		wait_attrs_equal(LCDC_ATTR_SIP);
+	}
+
 #ifndef BOARD_LCD_PIN_BL
 	xlcdc_writel(LCDC_DIS, LCDC_DIS_PWMDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
@@ -295,7 +309,7 @@ static void xlcdc_start(void)
 #endif
 }
 
-void xlcdc_show_base(void)
+static void xlcdc_show_base(void)
 {
 	xlcdc_writel(LCDC_BASECFG(1), LAYER_RGB_888_PACKED);
 	xlcdc_writel(LCDC_BASECFG(3), LAYER_RGB(LOGO_RGBDEF));
@@ -305,7 +319,7 @@ void xlcdc_show_base(void)
 	wait_attrs_equal(LCDC_ATTR_SIP);
 }
 
-void xlcdc_show_heo(void)
+static void xlcdc_show_heo(void)
 {
 	u32 xfactor, yfactor;
 
@@ -356,22 +370,28 @@ void xlcdc_show_heo(void)
 	wait_attrs_equal(LCDC_ATTR_SIP);
 }
 
-void lcdc_init(void)
+static void lcd_init(void)
 {
-	/* Invalidate bmp struct buffer */
-	xlcdc.bmp->bf_type[0] = 0;
-	xlcdc.bmp->bf_type[1] = 0;
+#ifdef CONFIG_LVDSC
+	lvdsc_clk_en();
+#endif
 
-	at91_xlcdc_hw_init();
+	xlcdc_stop();
+	xlcdc_start();
 #ifdef CONFIG_LVDSC
 	lvdsc_start();
 #endif
-	xlcdc_stop();
-	xlcdc_start();
 	xlcdc_show_base();
+	xlcdc_show_heo();
+
+#ifdef CONFIG_LOGO_BL_DELAY
+	if (LOGO_BL_DELAY)
+		mdelay(LOGO_BL_DELAY);
+#endif
+	xlcdc_set_backlight(LOGO_BL);
 }
 
-int lcdc_display(void)
+int lcd_display(void)
 {
 	u32 i;
 	u32 line_bytes;
@@ -492,14 +512,17 @@ UNSUPPORTED:
 	xlcdc.ovr_xpos      = (xlcdc.ovr_sc_width >= xlcdc.width) ? 0 : ((xlcdc.width - xlcdc.ovr_sc_width) / 2);
 	xlcdc.ovr_ypos      = (xlcdc.ovr_sc_height >= xlcdc.height) ? 0 : ((xlcdc.height - xlcdc.ovr_sc_height) / 2);
 
-	xlcdc_show_heo();
-#ifdef CONFIG_LOGO_BL_DELAY
-	if (LOGO_BL_DELAY)
-		mdelay(LOGO_BL_DELAY);
-#endif
-	xlcdc_set_backlight(LOGO_BL);
+	lcd_init();
 
 	return 0;
+}
+
+void lcd_off(void)
+{
+#ifdef CONFIG_LVDSC
+	lvdsc_stop();
+#endif
+	xlcdc_stop();
 }
 
 int bmp_size(void *p)

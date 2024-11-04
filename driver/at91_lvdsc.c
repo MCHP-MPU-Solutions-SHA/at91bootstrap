@@ -96,11 +96,10 @@ static void pll_config(u32 *pll_mul, u32 *pll_div, u32 *pll_fracr)
 }
 #endif
 
-void lvdsc_start(void)
+void lvdsc_clk_en(void)
 {
 	struct pmc_pll_cfg pll_cfg;
 	u32 p_mul = 0, p_div = 0, fracr = 0;
-	u32 reg;
 
 #if !defined(BOARD_LVDS_PLL_MUL) || \
 	!defined(BOARD_LVDS_PLL_DIV) || \
@@ -122,6 +121,11 @@ void lvdsc_start(void)
 	pll_cfg.fracr = fracr;
 	pll_cfg.acr  = AT91C_PLL_ACR_DEFAULT_LVDS;
 	pmc_sam9x60_cfg_pll(PLL_ID_LVDS, &pll_cfg);
+}
+
+void lvdsc_start(void)
+{
+	u32 reg;
 
 	lvdsc_writel(LVDSC_CR, 0);
 	while (lvdsc_readl(LVDSC_SR) & LVDSC_SR_CS);
@@ -143,4 +147,9 @@ void lvdsc_start(void)
 	lvdsc_writel(LVDSC_UCBR, 0);
 	lvdsc_writel(LVDSC_ACR, LVDSC_ACR_DCBIAS(9));
 	lvdsc_writel(LVDSC_CR, LVDSC_CR_SER_EN);
+}
+
+void lvdsc_stop(void)
+{
+	lvdsc_writel(LVDSC_CR, 0);
 }

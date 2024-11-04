@@ -26,7 +26,7 @@
 #ifdef CONFIG_NAND_DMA_SUPPORT
 #include "xdmac.h"
 #endif
-#include "lcdc.h"
+#include "lcd.h"
 
 #ifdef CONFIG_NANDFLASH_SMALL_BLOCKS
 static struct nand_chip nand_ids[] = {
@@ -1395,7 +1395,7 @@ int load_nandflash(struct image_info *image)
 	}
 
 	if (!ret)
-		lcdc_display();
+		lcd_display();
 #endif
 
 #if defined(CONFIG_LOAD_LINUX) || defined(CONFIG_LOAD_ANDROID)
