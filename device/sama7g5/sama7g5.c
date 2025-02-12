@@ -756,7 +756,7 @@ void at91_sdhc_hw_init(void)
 
 	pio_configure(sdmmc_pins);
 #if defined(CONFIG_SDHC1)
-	mdelay(500);
+	//mdelay(500);
 	pio_configure(sdmmc_pins_reset);
 #endif
 
