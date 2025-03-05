@@ -376,13 +376,12 @@ static void lcd_init(void)
 	lvdsc_clk_en();
 #endif
 
-	xlcdc_stop();
 	xlcdc_start();
+	xlcdc_show_base();
+	xlcdc_show_heo();
 #ifdef CONFIG_LVDSC
 	lvdsc_start();
 #endif
-	xlcdc_show_base();
-	xlcdc_show_heo();
 
 #ifdef CONFIG_LOGO_BL_DELAY
 	if (LOGO_BL_DELAY)
