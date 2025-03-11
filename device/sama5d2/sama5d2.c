@@ -38,6 +38,8 @@ __attribute__((weak)) void sdmmc_cal_setup(void);
 __attribute__((weak)) void at91_can_stdby_dis(void);
 __attribute__((weak)) void peripherals_hw_reset(void);
 
+void at91_lcdc_hw_init(void);
+
 #if defined(CONFIG_TWI)
 static struct at91_flexcom flexcoms[] = {
 	{AT91C_ID_FLEXCOM0, FLEXCOM_TWI, AT91C_BASE_FLEXCOM0, 0},
@@ -534,6 +536,10 @@ void hw_init(void)
 #ifdef CONFIG_BOARD_QUIRK_SAMA5D2_SIP
 	/* SiP: Implement the VDDSDMMC power supply over-consumption errata */
 	sdmmc_cal_setup();
+#endif
+
+#ifdef CONFIG_LCDC
+	at91_lcdc_hw_init();
 #endif
 
 #ifdef CONFIG_BOARD_QUIRK_SAMA5D2_ICP

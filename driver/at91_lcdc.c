@@ -221,7 +221,7 @@ static void lcdc_set_backlight(u8 level)
 	lcdc_writel(LCDC_CFG(6), cfg | LCDC_CFG6_PWMCVAL(level));
 }
 
-static void lcdc_off(void)
+static __attribute__((unused)) void lcdc_off(void)
 {
 	lcdc_writel(LCDC_DIS, LCDC_DIS_PWMDIS);
 	while (lcdc_readl(LCDC_SR) & LCDC_SR_PWMSTS);
@@ -344,19 +344,18 @@ void lcdc_show_heo(void)
 	lcdc_writel(LCDC_HEOCHER, LAYER_UPDATE | LAYER_CH);
 }
 
-void lcdc_init(void)
+void lcd_init(void)
 {
-	/* Invalidate bmp struct buffer */
-	lcdc.bmp->bf_type[0] = 0;
-	lcdc.bmp->bf_type[1] = 0;
-
-	at91_lcdc_hw_init();
-	lcdc_off();
 	lcdc_on();
 	lcdc_show_base();
+	lcdc_show_heo();
+
+	if (LOGO_BL_DELAY)
+		mdelay(LOGO_BL_DELAY);
+	lcdc_set_backlight(LOGO_BL);
 }
 
-int lcdc_display(void)
+int lcd_display(void)
 {
 	u32 i;
 	u32 line_bytes;
@@ -479,10 +478,7 @@ UNSUPPORTED:
 	lcdc.ovr_dma->next = (u32)lcdc.ovr_dma;
 	lcdc.ovr_dma->reserved = 0;
 
-	lcdc_show_heo();
-	if (LOGO_BL_DELAY)
-		mdelay(LOGO_BL_DELAY);
-	lcdc_set_backlight(LOGO_BL);
+	lcd_init();
 
 	return 0;
 }
