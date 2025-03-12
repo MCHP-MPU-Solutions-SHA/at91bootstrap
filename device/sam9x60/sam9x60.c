@@ -33,6 +33,8 @@
 
 __attribute__((weak)) void wilc_pwrseq();
 
+void at91_lcdc_hw_init(void);
+
 #define PLLA_DIV 1
 #define PLLA_COUNT 0x3f
 #define PLLA_CLOCK 200000000
@@ -335,6 +337,10 @@ void hw_init(void)
 	writel(reg, (AT91C_BASE_SFR + SFR_DDRCFG));
 	/* Initialize SDRAM Controller */
 	sdramc_init();
+#endif
+
+#ifdef CONFIG_LCDC
+	at91_lcdc_hw_init();
 #endif
 
 #ifdef CONFIG_BOARD_QUIRK_SAM9X60_EK
