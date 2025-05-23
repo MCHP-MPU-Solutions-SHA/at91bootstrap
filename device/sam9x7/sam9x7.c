@@ -497,6 +497,8 @@ void at91_xlcdc_hw_init(void)
 #endif
 #ifdef BOARD_LCD_PIN_BL
 		{"LCDBL"  , BOARD_LCD_PIN_BL  , 0, PIO_DEFAULT, PIO_OUTPUT},
+#else
+		{"LCDPWM" , AT91C_PIN_PC(26)  , 0, PIO_DEFAULT, PIO_PERIPH_A},
 #endif
 		{(char *)0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
 	};
