@@ -25,6 +25,7 @@
 #include "board.h"
 #include "led.h"
 #include "nand.h"
+#include "lvdsc.h"
 
 __attribute__((weak)) void wilc_pwrseq(void);
 __attribute__((weak)) void at91_can_stdby_dis(void);
@@ -510,6 +511,7 @@ void at91_xlcdc_hw_init(void)
 				ATMEL_XLCDC_GCKDIV_VALUE);
 #ifdef CONFIG_LVDSC
 	pmc_enable_periph_clock(CONFIG_SYS_ID_LVDSC, PMC_PERIPH_CLK_DIVIDER_NA);
+	lvdsc_clk_en();
 #endif
 }
 #endif /* #ifdef CONFIG_XLCDC */

@@ -372,12 +372,6 @@ static void xlcdc_show_heo(void)
 
 static void lcd_init(void)
 {
-#ifdef CONFIG_LVDSC
-	lvdsc_clk_en();
-	/* Delay before LVDS PLL clock stable */
-	mdelay(1);
-#endif
-
 	xlcdc_start();
 	xlcdc_show_base();
 	xlcdc_show_heo();
