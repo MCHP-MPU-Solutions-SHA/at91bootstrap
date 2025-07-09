@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "common.h"
+#include "bitops.h"
 #include "string.h"
 #include "mci_media.h"
 #include "timer.h"
@@ -1112,19 +1113,21 @@ static int mmc_bus_width_select(struct sd_card *sdcard, unsigned int buswidth,
 
 static int mmc_detect_buswidth(struct sd_card *sdcard)
 {
+	struct sd_host *host = sdcard->host;
 	unsigned char data_8bits[8] = {0x55, 0xaa, 0, 0, 0, 0, 0, 0};
 	unsigned char data_4bits[4] = {0x5a, 0, 0, 0};
 	unsigned char read_data[8];
 	unsigned char *pdata_w;
 
 	unsigned int busw;
+	unsigned int hostw = 1 << (fls(host->caps_bus_width) - 1);
 	unsigned int len;
 	unsigned int i;
 	int ret;
 
 	console_printf("MMC: detecting buswidth...\n");
 
-	for (busw = 8, len = 2; busw != 0; busw -= 4, len--) {
+	for (busw = hostw, len = 2; busw != 0; busw -= 4, len--) {
 		pdata_w = (busw == 8) ? data_8bits : data_4bits;
 
 		ret = mmc_bus_width_select(sdcard, busw, 0);
@@ -1554,6 +1557,8 @@ static int mmc_initialization(struct sd_card *sdcard)
 		ret = mmc_bus_width_select(sdcard, sdcard->configured_bus_w, 1);
 		if (ret)
 			console_printf("MMC: DDR mode could not be enabled: %d\n", ret);
+		else
+			console_printf("MMC: DDR mode enabled\n");
 	}
 
 	return 0;
