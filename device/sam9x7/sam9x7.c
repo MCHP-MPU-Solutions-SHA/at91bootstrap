@@ -25,6 +25,7 @@
 #include "board.h"
 #include "led.h"
 #include "nand.h"
+#include "lvdsc.h"
 
 #ifdef CONFIG_MMU
 #include "mmu_cp15.h"
@@ -32,6 +33,7 @@
 __attribute__((weak)) void wilc_pwrseq(void);
 __attribute__((weak)) void at91_can_stdby_dis(void);
 __attribute__((weak)) void at91_rio0_select(void);
+void at91_xlcdc_hw_init(void);
 
 #define PLLA_DIV 0
 #define PLLA_COUNT 0x3f
@@ -342,6 +344,10 @@ void hw_init(void)
 	at91_rio0_select();
 #endif
 
+#ifdef CONFIG_XLCDC
+	at91_xlcdc_hw_init();
+#endif
+
 #ifdef CONFIG_BOARD_QUIRK_SAM9X75_EB
 	/* Perform the WILC initialization sequence */
 	wilc_pwrseq();
@@ -601,3 +607,39 @@ void mmu_tlb_init(unsigned int *tlb)
 	           | TTB_TYPE_SECT;
 }
 #endif /* #ifdef CONFIG_MMU */
+
+#ifdef CONFIG_XLCDC
+
+#define ATMEL_XLCDC_GCKDIV_VALUE     3
+
+void at91_xlcdc_hw_init(void)
+{
+	const struct pio_desc xlcdc_pins[] = {
+#ifdef BOARD_LCD_PIN_RST
+		{"LCDRST" , BOARD_LCD_PIN_RST , 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_EN
+		{"LCDEN"  , BOARD_LCD_PIN_EN  , 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_DISP
+		{"LCDDISP", BOARD_LCD_PIN_DISP, 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_BL
+		{"LCDBL"  , BOARD_LCD_PIN_BL  , 0, PIO_DEFAULT, PIO_OUTPUT},
+#else
+		{"LCDPWM" , AT91C_PIN_PC(26)  , 0, PIO_DEFAULT, PIO_PERIPH_A},
+#endif
+		{(char *)0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
+	};
+
+	pio_configure(xlcdc_pins);
+	pmc_enable_periph_clock(CONFIG_SYS_ID_XLCDC, PMC_PERIPH_CLK_DIVIDER_NA);
+	pmc_enable_generic_clock(CONFIG_SYS_ID_XLCDC,
+				GCK_CSS_MCK_CLK,
+				ATMEL_XLCDC_GCKDIV_VALUE);
+#ifdef CONFIG_LVDSC
+	pmc_enable_periph_clock(CONFIG_SYS_ID_LVDSC, PMC_PERIPH_CLK_DIVIDER_NA);
+	lvdsc_clk_en();
+#endif
+}
+#endif /* #ifdef CONFIG_XLCDC */
