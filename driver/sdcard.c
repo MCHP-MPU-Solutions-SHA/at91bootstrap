@@ -7,6 +7,7 @@
 #include "hardware.h"
 #include "board.h"
 #include "lcd.h"
+#include "usart.h"
 
 #include "string.h"
 
@@ -132,6 +133,18 @@ int load_sdcard(struct image_info *image)
 					image->filename, image->dest);
 
 	ret = sdcard_loadimage(image->filename, image->dest);
+#ifdef CONFIG_DUAL_BOOT
+	if (usart_rx_ready()) {
+		dbg_info("SD/MMC: Dual boot detected, Read file %s to %x\n",
+				CONFIG_DUAL_IMAGE_NAME, CONFIG_DUAL_JUMP_ADDR);
+
+		ret = sdcard_loadimage(CONFIG_DUAL_IMAGE_NAME,
+					(unsigned char *)CONFIG_DUAL_JUMP_ADDR);
+		if (!ret) {
+			((void (*)(void))CONFIG_DUAL_JUMP_ADDR)();
+		}
+	}
+#endif
 	if (ret) {
 		(void)f_mount(0, NULL);
 		return ret;
