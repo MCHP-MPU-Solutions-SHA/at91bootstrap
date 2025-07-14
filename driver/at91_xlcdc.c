@@ -189,10 +189,20 @@ static u32 clock_div(void)
 static void xlcdc_set_backlight(u8 level)
 {
 #ifndef BOARD_LCD_PIN_BL
+	const struct pio_desc bl_pin[] = {
+		{"LCDPWM" , AT91C_PIN_PC(26)  , 0, PIO_DEFAULT, PIO_PERIPH_A},
+		{(char *)0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
+	};
 	u32 cfg = xlcdc_readl(LCDC_CFG(6)) & ~LCDC_CFG6_PWMCVAL_MASK;
 	xlcdc_writel(LCDC_CFG(6), cfg | LCDC_CFG6_PWMCVAL(level));
+
+        pio_configure(bl_pin);
 #else
 	pio_set_gpio_output(BOARD_LCD_PIN_BL, level ? 1 : 0);
+#endif
+
+#ifdef BOARD_LCD_PIN_BL_EN
+	pio_set_gpio_output(BOARD_LCD_PIN_BL_EN, 1);
 #endif
 }
 
