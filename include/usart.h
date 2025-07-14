@@ -14,5 +14,6 @@
 extern void usart_init(unsigned int);
 extern void usart_puts(const char *ptr);
 extern char usart_getc(void);
+extern int usart_rx_ready(void);
 
 #endif /* __USART_H__ */

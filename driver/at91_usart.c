@@ -77,6 +77,11 @@ char usart_getc(void)
 	return (char)read_usart(DBGU_RHR);
 }
 
+int usart_rx_ready(void)
+{
+	return !!(read_usart(DBGU_CSR) & AT91C_DBGU_RXRDY);
+}
+
 #else
 
 void usart_puts(const char *ptr)

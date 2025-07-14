@@ -219,6 +219,19 @@ config IMAGE_NAME
 	default "u-boot.bin" if LOAD_UBOOT
 	default "softpack.bin" if LOAD_64KB || LOAD_4MB || LOAD_1MB
 
+config DUAL_BOOT
+	bool "Dual Boot support"
+	default n
+
+config DUAL_IMAGE_NAME
+	string "Dual Software Image File Name"
+	depends on DUAL_BOOT
+	default "u-boot.bin" if LINUX_IMAGE
+
+config DUAL_JUMP_ADDR
+	hex "The External Ram Address to Load Dual Image"
+	depends on DUAL_BOOT
+	default 0x23f00000
 
 source "device/Config.in.mach"
 
