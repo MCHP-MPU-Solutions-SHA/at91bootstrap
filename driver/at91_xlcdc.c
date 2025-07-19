@@ -223,36 +223,68 @@ static void xlcdc_stop(void)
 	}
 
 #ifndef BOARD_LCD_PIN_BL
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_PWMDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_PWMDIS);
 	wait_lcdsr_equal(LCDC_SR_PWMSTS);
 #endif
 
 #ifdef CONFIG_MIPI_DSI
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_CMDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_CMDIS);
 	wait_lcdsr_equal(LCDC_SR_CMSTS);
 #endif
 
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_SDDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_SDDIS);
 	wait_lcdsr_nonequal(LCDC_SR_SDSTS);
 
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_DISPDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_DISPDIS);
 	wait_lcdsr_equal(LCDC_SR_DISPSTS);
 
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_SYNCDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_SYNCDIS);
 	wait_lcdsr_equal(LCDC_SR_LCDSTS);
 
-	xlcdc_writel(LCDC_DIS, LCDC_DIS_CLKDIS);
 	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_DIS, LCDC_DIS_CLKDIS);
 	wait_lcdsr_equal(LCDC_SR_CLKSTS);
 }
 
 static void xlcdc_start(void)
 {
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_CLKEN);
+	wait_lcdsr_nonequal(LCDC_SR_CLKSTS);
+
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_SYNCEN);
+	wait_lcdsr_nonequal(LCDC_SR_LCDSTS);
+
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_DISPEN);
+	wait_lcdsr_nonequal(LCDC_SR_DISPSTS);
+
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_SDEN);
+	wait_lcdsr_equal(LCDC_SR_SDSTS);
+
+#ifdef CONFIG_MIPI_DSI
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_CMEN);
+	wait_lcdsr_nonequal(LCDC_SR_CMSTS);
+#endif
+
+#ifndef BOARD_LCD_PIN_BL
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
+	xlcdc_writel(LCDC_EN, LCDC_EN_PWMEN);
+	wait_lcdsr_nonequal(LCDC_SR_PWMSTS);
+#endif
+}
+
+static void xlcdc_configure(void)
+{
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 #ifdef CONFIG_LVDSC
 	xlcdc_writel(LCDC_CFG(0), LCDC_CFG0_CLKPWMSEL |
 				 LCDC_CFG0_CLKBYP);
@@ -260,62 +292,33 @@ static void xlcdc_start(void)
 	xlcdc_writel(LCDC_CFG(0), LCDC_CFG0_CLKDIV(clock_div()) |
 				 LCDC_CFG0_CLKPWMSEL);
 #endif
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(1), LCDC_CFG1_VSPW(xlcdc.timing_vpw - 1) |
 				 LCDC_CFG1_HSPW(xlcdc.timing_hpw - 1));
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(2), LCDC_CFG2_VBPW(xlcdc.timing_vbp - 1) |
 				 LCDC_CFG2_VFPW(xlcdc.timing_vfp - 1));
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(3), LCDC_CFG3_HBPW(xlcdc.timing_hbp - 1) |
 				 LCDC_CFG3_HFPW(xlcdc.timing_hfp - 1));
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(4), LCDC_CFG4_RPF(xlcdc.height - 1) |
 				 LCDC_CFG4_PPL(xlcdc.width - 1));
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(5), LCDC_CFG5_GUARDTIME(0) |
 				 LCDC_CFG5_DPI |
 				 LCDC_CFG5_MODE_OUTPUT_DPI_24BPP);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 
 #ifndef BOARD_LCD_PIN_BL
+	wait_lcdsr_equal(LCDC_SR_SIPSTS);
 	xlcdc_writel(LCDC_CFG(6), LCDC_CFG6_PWMCVAL(0) |
 				 LCDC_CFG6_PWMPOL |
 				 LCDC_CFG6_PWMPS(6));
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-#endif
-
-	xlcdc_writel(LCDC_EN, LCDC_EN_CLKEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_nonequal(LCDC_SR_CLKSTS);
-
-	xlcdc_writel(LCDC_EN, LCDC_EN_SYNCEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_nonequal(LCDC_SR_LCDSTS);
-
-	xlcdc_writel(LCDC_EN, LCDC_EN_DISPEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_nonequal(LCDC_SR_DISPSTS);
-
-	xlcdc_writel(LCDC_EN, LCDC_EN_SDEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_equal(LCDC_SR_SDSTS);
-
-#ifdef CONFIG_MIPI_DSI
-	xlcdc_writel(LCDC_EN, LCDC_EN_CMEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_nonequal(LCDC_SR_CMSTS);
-#endif
-
-#ifndef BOARD_LCD_PIN_BL
-	xlcdc_writel(LCDC_EN, LCDC_EN_PWMEN);
-	wait_lcdsr_equal(LCDC_SR_SIPSTS);
-	wait_lcdsr_nonequal(LCDC_SR_PWMSTS);
 #endif
 }
 
@@ -382,12 +385,13 @@ static void xlcdc_show_heo(void)
 
 static void lcd_init(void)
 {
-	xlcdc_start();
-	xlcdc_show_base();
-	xlcdc_show_heo();
 #ifdef CONFIG_LVDSC
 	lvdsc_start();
 #endif
+	xlcdc_configure();
+	xlcdc_show_base();
+	xlcdc_show_heo();
+	xlcdc_start();
 
 #ifdef CONFIG_LOGO_BL_DELAY
 	if (CONFIG_LOGO_BL_DELAY)
