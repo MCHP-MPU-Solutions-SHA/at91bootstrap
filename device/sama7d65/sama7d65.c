@@ -24,6 +24,7 @@
 #include "timer.h"
 #include "sdhc_cal.h"
 #include "led.h"
+#include "lvdsc.h"
 #include "arch/tz_matrix.h"
 #include "matrix.h"
 #include "arch/at91_sfr.h"
@@ -855,6 +856,42 @@ void twi_init()
 }
 #endif /* CONFIG_TWI */
 
+#ifdef CONFIG_XLCDC
+
+#define ATMEL_XLCDC_GCKDIV_VALUE     3
+
+void at91_xlcdc_hw_init(void)
+{
+	const struct pio_desc xlcdc_pins[] = {
+#ifdef BOARD_LCD_PIN_RST
+		{"LCDRST" , BOARD_LCD_PIN_RST , 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_EN
+		{"LCDEN"  , BOARD_LCD_PIN_EN  , 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_DISP
+		{"LCDDISP", BOARD_LCD_PIN_DISP, 1, PIO_DEFAULT, PIO_OUTPUT},
+#endif
+#ifdef BOARD_LCD_PIN_BL
+		{"LCDBL"  , BOARD_LCD_PIN_BL  , 0, PIO_DEFAULT, PIO_OUTPUT},
+#else
+		{"LCDPWM" , AT91C_PIN_PD(6)  , 0, PIO_DEFAULT, PIO_PERIPH_A},
+#endif
+		{(char *)0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
+	};
+
+	pio_configure(xlcdc_pins);
+	pmc_enable_periph_clock(CONFIG_SYS_ID_XLCDC, PMC_PERIPH_CLK_DIVIDER_NA);
+	pmc_enable_generic_clock(CONFIG_SYS_ID_XLCDC,
+				GCK_CSS_MCK_CLK,
+				ATMEL_XLCDC_GCKDIV_VALUE);
+#ifdef CONFIG_LVDSC
+	pmc_enable_periph_clock(CONFIG_SYS_ID_LVDSC, PMC_PERIPH_CLK_DIVIDER_NA);
+	lvdsc_clk_en(PLL_ID_LVDSPLL);
+#endif
+}
+#endif /* #ifdef CONFIG_XLCDC */
+
 void hw_preinit(void)
 {
 	/*
@@ -1061,6 +1098,10 @@ void hw_init(void)
 
 	/* read-clean the SHDWC Status Register */
 	shdwc_read_status();
+
+#ifdef CONFIG_XLCDC
+	at91_xlcdc_hw_init();
+#endif
 
 #ifdef CONFIG_BOARD_QUIRK_OURASI_DDR3_EB
        at91_can_stdby_dis();

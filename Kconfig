@@ -1242,6 +1242,7 @@ config LOGO_ADDRESS
 config LOGO_FB_ADDRESS
 	hex "Logo framebuffer address"
 	depends on LOGO
+	default 0x60000000 if SAMA7D65
 	default TOP_OF_MEMORY
 	help
 	  The address of the framebuffer in SRAM or DDR

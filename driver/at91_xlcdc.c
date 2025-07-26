@@ -122,11 +122,7 @@ static inline unsigned char reverse_4bit(unsigned char c)
 
 static inline unsigned int xlcdc_get_clock(void)
 {
-#if defined(CONFIG_SAM9X7)
 	return pmc_get_generic_clock(CONFIG_SYS_ID_XLCDC);
-#else
-	#error "XLCDC: Could NOT get source clock!"
-#endif
 }
 
 static unsigned int xlcdc_readl(unsigned int reg)

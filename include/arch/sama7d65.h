@@ -35,6 +35,8 @@
 #define AT91C_ID_FLEXCOM9	43
 #define AT91C_ID_FLEXCOM10	44
 
+#define AT91C_ID_LCDC		56
+
 #define AT91C_ID_QSPI0		73
 #define AT91C_ID_QSPI1		74
 #define AT91C_ID_SDMMC0		75
@@ -43,6 +45,8 @@
 
 #define AT91C_ID_PIT64B0	66
 #define AT91C_ID_PIT64B		AT91C_ID_PIT64B0
+
+#define AT91C_ID_LVDSC		104
 
 /*
  * User Peripherals physical base addresses.
@@ -74,6 +78,10 @@
 #define AT91C_BASE_SDMMC0	0xe1204000
 #define AT91C_BASE_SDMMC1	0xe1208000
 #define AT91C_BASE_SDMMC2	0xe120c000
+
+#define AT91C_BASE_LCDC		0xe1400000
+#define AT91C_BASE_DSI		0xe1404000
+#define AT91C_BASE_LVDSC	0xe1408000
 
 #define AT91C_BASE_SFR		0xe181c000
 

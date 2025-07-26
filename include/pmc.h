@@ -43,6 +43,7 @@ enum pll_ids {
 	PLL_ID_BAUDPLL,
 	PLL_ID_AUDIOPLL,
 	PLL_ID_ETHPLL,
+	PLL_ID_LVDSPLL,
 	#endif
 	PLL_ID_MAX,
 };
