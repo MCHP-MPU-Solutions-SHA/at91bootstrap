@@ -376,8 +376,8 @@ static void lcd_init(void)
 #endif
 	xlcdc_configure();
 	xlcdc_show_base();
-	xlcdc_show_heo();
 	xlcdc_start();
+	xlcdc_show_heo();
 
 #ifdef CONFIG_LOGO_BL_DELAY
 	if (CONFIG_LOGO_BL_DELAY)
