@@ -639,7 +639,7 @@ void at91_xlcdc_hw_init(void)
 				ATMEL_XLCDC_GCKDIV_VALUE);
 #ifdef CONFIG_LVDSC
 	pmc_enable_periph_clock(CONFIG_SYS_ID_LVDSC, PMC_PERIPH_CLK_DIVIDER_NA);
-	lvdsc_clk_en();
+	lvdsc_clk_en(PLL_ID_LVDS);
 #endif
 }
 #endif /* #ifdef CONFIG_XLCDC */
